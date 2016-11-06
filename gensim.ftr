@@ -1,0 +1,29 @@
+# coding: utf-8
+# __author__ = 'lllcho'
+# __date__ = '11/6/2016'
+import gensim
+from gensim.models.doc2vec import TaggedDocument
+from process import *
+
+prefix = 'G:\BaiduYunDownload\sogo/'
+data = Data(prefix)
+# w2v_model = Word2Vec(prefix)
+# jieba.load_userdict(prefix + 'jieba_dict.csv')
+
+uids, Y, docs= data.load_data('train')
+
+nb_vecs = []
+all_words = []
+for doc in docs:
+    sentences=[]
+    for sentence in doc.split(','):
+        words = word_cut(sentence, forsearch=False)
+        sentences.append(words)
+    # words = w2v_model.filter_words(words)
+    all_words.append(sentences)
+print len(all_words)
+doc_words=[sum(sen,[]) for sen in all_words]
+sen_words=sum(all_words,[])
+docs=[TaggedDocument(word,[tag]) for word,tag in zip(doc_words,range(len(doc_words)))]
+# model = gensim.models.Doc2Vec.load_word2vec_format(prefix+'vectors2.bin', binary=True,unicode_errors='ignore',datatype='float32')
+docmodel=gensim.models.Doc2Vec(docs,workers=4)
